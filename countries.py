@@ -192,9 +192,3 @@ def start():
 
 countryInfo = start()
 processedData = processResult(countryInfo)
-
-"""
-string = "16 languages:[3] ChewaChibarweEnglishKalanga"Koisan" (presumably Tsoa)NambyaNdauNdebeleShanganiShona"sign language"SothoTongaTswanaVendaXhosa"
-string = string.replace(u'\"',u'\'')
-
-test = fixSpaces(string)"""
