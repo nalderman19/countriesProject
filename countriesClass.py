@@ -7,6 +7,10 @@ Countries Project - scrape wikipedia data into dataframe
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup as bs
+import os
+import pdfkit
+import random
+
 
 
 class countrySearch:
@@ -28,6 +32,10 @@ class countrySearch:
         self.prcResult = self.processResult(self.info)
         cunt = pd.DataFrame({'Stat':"Country", 'Info':self.name}, index=[1])
         self.finalResult = pd.concat([cunt,self.finalInfo(self.prcResult)]).reset_index(drop=True)
+
+    def saveImageClass(self):
+        self.saveImage(self.finalResult,css, self.name)
+
 
     # static methods
     @staticmethod
@@ -124,6 +132,7 @@ class countrySearch:
         for i in range(len(tdf)):
             tdf.iloc[i]['Info'] = countrySearch.fixFootnotes(tdf.iloc[i]['Info'])
             tdf.iloc[i]['Info'] = countrySearch.fixSpaces(tdf.iloc[i]['Info'])
+            tdf.iloc[i]['Stat'] = countrySearch.fixBullets(tdf.iloc[i]['Stat'])
 
         tdf = countrySearch.fixCities(tdf)
         return tdf
@@ -174,6 +183,12 @@ class countrySearch:
             return countrySearch.fixFootnotes(string)
         else:
             return string
+
+    @staticmethod
+    def fixBullets(string): # looks for bullet, replaces it with hyphen
+        string = string.replace(u'\xa0',u' ')
+        string = string.replace('•', '-')
+        return string
 
     @staticmethod
     def fixCities(frame):
@@ -234,4 +249,57 @@ class countrySearch:
 
         newdf = pd.concat([newdf,areaDf,popDf,gdpDf]).reset_index(drop=True)
         return newdf
-        return newdf
+
+    @staticmethod
+    def saveImage(frame,css, name):
+        # make temporary html file under random name
+        fn = str(random.random()*100000000).split(".")[0] + ".html"
+        try:
+            os.remove(fn)
+        except:
+            None
+        text_file = open(fn, "a")
+        # write the CSS
+        text_file.write(css)
+        # write the HTML-ized Pandas DataFrame
+        text_file.write(frame.to_html())
+        text_file.close()
+
+        # See IMGKit options for full configuration,
+        # e.g. cropping of final image
+        path = r'/usr/local/bin/wkhtmltopdf'
+        config = pdfkit.configuration(wkhtmltopdf=path)
+        pdfkit.from_file(fn, "images/" + name + ".pdf", configuration=config)
+        os.remove(fn)
+
+css = """
+<style type=\"text/css\">
+table {
+color: #333;
+font-family: Helvetica, Arial, sans-serif;
+width: 640px;
+border-collapse:
+collapse;
+border-spacing: 0;
+}
+
+td, th {
+border: 1px solid transparent; /* No more visible border */
+height: 30px;
+}
+
+th {
+background: #DFDFDF; /* Darken header a bit */
+font-weight: bold;
+}
+
+td {
+background: #FAFAFA;
+text-align: center;
+}
+
+table tr:nth-child(odd) td{
+background-color: white;
+}
+</style>
+"""

@@ -15,7 +15,10 @@ if (len(in1) == 1):
     name = input("Enter the index of desired country, or type in name of country: ")
     search.getNameClass(int(name))
 else:
-    in2 = search.df[first.df['Country'].str.match(in1)].reset_index()
+    in2 = search.df[search.df['Country'].str.match(in1)].reset_index()
     in3 = str(in2.iloc[0][1])
     search.getNameClass(in3)
 search.processResultClass()
+
+search.saveImageClass()
+
