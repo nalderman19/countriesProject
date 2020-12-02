@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup as bs
 import os
 import pdfkit
 import random
+from html2image import Html2Image
 
 
 
@@ -252,7 +253,17 @@ class countrySearch:
 
     @staticmethod
     def saveImage(frame,css, name):
-        # make temporary html file under random name
+        hti = Html2Image()
+        hti.output_path = 'images/'
+        html = frame.to_html()
+        hti.screenshot(
+            html_str=html,
+            css_str=css,
+            save_as=name + ".png")
+        # TODO Crop png using PIL
+
+        # VVVV Code for saving html as pdf
+        """# make temporary html file under random name
         fn = str(random.random()*100000000).split(".")[0] + ".html"
         try:
             os.remove(fn)
@@ -267,10 +278,10 @@ class countrySearch:
 
         # See IMGKit options for full configuration,
         # e.g. cropping of final image
-        path = r'/usr/local/bin/wkhtmltopdf'
-        config = pdfkit.configuration(wkhtmltopdf=path)
-        pdfkit.from_file(fn, "images/" + name + ".pdf", configuration=config)
-        os.remove(fn)
+        #path = r'/usr/local/bin/wkhtmltopdf'
+        #config = pdfkit.configuration(wkhtmltopdf=path)
+        #pdfkit.from_file(fn, "images/" + name + ".pdf", configuration=config)
+        #os.remove(fn)"""
 
 css = """
 <style type=\"text/css\">
@@ -291,6 +302,7 @@ height: 30px;
 th {
 background: #DFDFDF; /* Darken header a bit */
 font-weight: bold;
+text-align: center;
 }
 
 td {
